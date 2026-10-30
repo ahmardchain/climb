@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --ink: #14233b;
+  --muted: #55627a;
+  --subtle: #8792a8;
+  --accent: #14233b;
+  --on-accent: #ffffff;
+  --accent-hover: #2a4f8f;
+  --pop: #ff6b4a;
+  --mint: #19a974;
+  --sun: #ffcd83;
+  --sky: #85b1ed;
+  --danger: #d6455d;
+  --success: #1a8047;
+  --surface-rgb: 255 255 255;
+  --card-bg: rgba(255, 255, 255, 0.64);
+  --card-border: rgba(255, 255, 255, 0.68);
+  --card-shadow: 0 8px 32px rgba(18, 45, 69, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --inner-bg: rgba(255, 255, 255, 0.5);
+  --inner-border: rgba(255, 255, 255, 0.6);
+  --sheet-bg: rgba(255, 255, 255, 0.95);
+  --canvas: linear-gradient(180deg, #f9f9fc 0%, #fffcf7 52%, #fbf7f2 100%);
+  --blob-a: rgba(133, 177, 237, 0.22);
+  --blob-b: rgba(255, 205, 131, 0.24);
+  --mint-ink: #0f7a54;
+  --pop-ink: #c8431f;
+  --sky-ink: #2a4f8f;
+  --sun-ink: #8a5a00;
+  --danger-ink: #a8233b;
+  --mint-tint: rgba(25, 169, 116, 0.15);
+  --pop-tint: rgba(255, 107, 74, 0.15);
+  --sky-tint: rgba(133, 177, 237, 0.26);
+  --sun-tint: rgba(255, 205, 131, 0.45);
+  --danger-tint: rgba(214, 69, 93, 0.14);
+}
+
+.dark {
+  color-scheme: dark;
+  --ink: #eef2fb;
+  --muted: #aab6cc;
+  --subtle: #8190aa;
+  --accent: #dbe6ff;
+  --on-accent: #0d1626;
+  --accent-hover: #9fc0ff;
+  --success: #52e0a8;
+  --surface-rgb: 32 45 72;
+  --card-bg: rgba(22, 32, 54, 0.72);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --inner-bg: rgba(255, 255, 255, 0.06);
+  --inner-border: rgba(255, 255, 255, 0.09);
+  --sheet-bg: rgba(15, 23, 41, 0.97);
+  --canvas: linear-gradient(180deg, #0a101d 0%, #0e1627 55%, #101a2e 100%);
+  --blob-a: rgba(95, 140, 220, 0.18);
+  --blob-b: rgba(255, 150, 100, 0.12);
+  --mint-ink: #52e0a8;
+  --pop-ink: #ff9a80;
+  --sky-ink: #9fc0ff;
+  --sun-ink: #ffd68a;
+  --danger-ink: #ff8da1;
+  --mint-tint: rgba(25, 169, 116, 0.22);
+  --pop-tint: rgba(255, 107, 74, 0.22);
+  --sky-tint: rgba(133, 177, 237, 0.2);
+  --sun-tint: rgba(255, 205, 131, 0.18);
+  --danger-tint: rgba(214, 69, 93, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', ui-sans-serif, sans-serif;
+  color: var(--ink);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+input,
+textarea {
+  color: var(--ink);
+}
+
+.display {
+  font-family: 'Space Grotesk', 'DM Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.glass-inner {
+  background: var(--inner-bg);
+  border: 1px solid var(--inner-border);
+}
+
+.tag {
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 11px;
+  font-weight: 700;
+}
+.tag-mint { background: var(--mint-tint); color: var(--mint-ink); }
+.tag-pop { background: var(--pop-tint); color: var(--pop-ink); }
+.tag-sky { background: var(--sky-tint); color: var(--sky-ink); }
+.tag-sun { background: var(--sun-tint); color: var(--sun-ink); }
+.tag-danger { background: var(--danger-tint); color: var(--danger-ink); }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.4em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.word-in { animation: word-in 0.45s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
