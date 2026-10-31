@@ -1,4 +1,4 @@
-import { Compass, Newspaper, Plus, Trophy, User } from 'lucide-react'
+import { Compass, Home, Newspaper, Plus, User } from 'lucide-react'
 import { link } from '@/lib/router'
 import { useUi } from '@/lib/ui-context'
 
@@ -14,10 +14,11 @@ export function BottomNav({ path, onBountyPage }: Props) {
     <a
       {...link(to)}
       aria-current={match(path) ? 'page' : undefined}
-      className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
+      className={`relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${
         match(path) ? 'text-[var(--ink)]' : 'text-[var(--subtle)]'
       }`}
     >
+      {match(path) && <span className="absolute top-0 h-1 w-6 rounded-full bg-[var(--pop)]" aria-hidden />}
       <Icon className="size-5" />
       {label}
     </a>
@@ -26,8 +27,8 @@ export function BottomNav({ path, onBountyPage }: Props) {
   return (
     <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[max(env(safe-area-inset-bottom),8px)]">
       <div className="glass-card relative flex w-full max-w-md items-end rounded-3xl px-2">
-        {tab('/profile', 'Profile', User, (p) => p.startsWith('/profile'))}
-        {tab('/leaderboard', 'Leaders', Trophy, (p) => p === '/leaderboard')}
+        {tab('/', 'Home', Home, (p) => p === '/')}
+        {tab('/feed', 'Feed', Newspaper, (p) => p === '/feed')}
         <div className="flex flex-1 flex-col items-center pb-1.5">
           <button
             onClick={onBountyPage ? openClaim : openCreate}
@@ -39,8 +40,8 @@ export function BottomNav({ path, onBountyPage }: Props) {
           </button>
           <span className="mt-0.5 whitespace-nowrap text-[11px] font-semibold">{onBountyPage ? 'Create claim' : 'Create bounty'}</span>
         </div>
-        {tab('/feed', 'Feed', Newspaper, (p) => p === '/feed')}
         {tab('/explore', 'Explore', Compass, (p) => p === '/explore')}
+        {tab('/profile', 'Profile', User, (p) => p.startsWith('/profile'))}
       </div>
     </nav>
   )
