@@ -65,45 +65,74 @@ function PendingBanner() {
   )
 }
 
+function EmptyCard({ icon: Icon, children, action }: { icon: typeof Flag; children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="glass-inner flex flex-col items-center gap-2 rounded-3xl px-6 py-8 text-center text-sm text-[var(--muted)]">
+      <Icon className="size-6 text-[var(--subtle)]" />
+      <p className="text-pretty">{children}</p>
+      {action}
+    </div>
+  )
+}
+
+const MAX_CLAIM_CARDS = 12
+
 function LatestClaims({ list }: { list: ReturnType<typeof useBountyList>['data'] }) {
-  const { data: claims } = useAllClaims(list)
+  const { data: claims, isLoading } = useAllClaims(list)
   const withImages = useMemo(
-    () => (claims ?? []).filter((c) => classifyProof(c.claim.proofURI).kind === 'image').slice(0, 12),
+    () => (claims ?? []).filter((c) => classifyProof(c.claim.proofURI).kind === 'image').slice(0, MAX_CLAIM_CARDS),
     [claims],
   )
-  if (withImages.length === 0) return null
+  const loading = !list || isLoading
+  // Same-size cards: 6 fit across a desktop row, the rest scroll sideways.
+  const card = 'relative block aspect-[4/5] w-40 shrink-0 snap-start overflow-hidden rounded-2xl md:w-44 lg:w-[calc((100%-5*0.75rem)/6)]'
   return (
-    <section className="mb-5">
+    <section className="mb-6">
       <h2 className="display mb-2 text-lg font-semibold">Latest claims</h2>
-      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
-        {withImages.map(({ claim, bounty }) => {
-          return (
-            <a
-              key={`${bounty.id}-${claim.id}`}
-              {...link(`/bounty/${bounty.id}`)}
-              className="glass-card relative block aspect-[4/5] w-40 shrink-0 snap-start overflow-hidden rounded-2xl"
-            >
-              <ProofImage uri={claim.proofURI} className="size-full object-cover" />
+      {loading && ESCROW_ADDRESS ? (
+        <div className="no-scrollbar flex gap-3 overflow-hidden">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`${card} animate-pulse bg-surface/50`} />
+          ))}
+        </div>
+      ) : withImages.length === 0 ? (
+        <EmptyCard
+          icon={Flag}
+          action={
+            <Btn small tone="ghost" onClick={() => document.getElementById('bounties')?.scrollIntoView({ behavior: 'smooth' })}>
+              Browse open bounties
+            </Btn>
+          }
+        >
+          No claims yet. Be the first to send proof.
+        </EmptyCard>
+      ) : (
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:-mx-6 md:px-6 lg:mx-0 lg:px-0">
+          {withImages.map(({ claim, bounty }) => (
+            <a key={`${bounty.id}-${claim.id}`} {...link(`/bounty/${bounty.id}`)} className={`glass-card ${card}`}>
+              <ProofImage uri={claim.proofURI} className="absolute inset-0 size-full object-cover" />
               <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2.5 text-xs font-semibold text-white">
                 <span className="line-clamp-2">{bounty.title}</span>
               </span>
             </a>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
 
+const MAX_PAYOUTS = 5
+
 function RecentPayouts() {
-  const { data } = useEvents()
+  const { data, isLoading } = useEvents()
   const now = useNow(30_000)
   const rows = useMemo(() => {
     const events = data?.events ?? []
     const meta = bountyMeta(events)
     return events
       .filter((e) => e.name === 'BountyPaid')
-      .slice(-5)
+      .slice(-MAX_PAYOUTS)
       .reverse()
       .map((e) => {
         const id = (e.args.bountyId as bigint).toString()
@@ -117,27 +146,32 @@ function RecentPayouts() {
         }
       })
   }, [data])
-  if (rows.length === 0) return null
   return (
-    <section className="mb-5">
+    <section className="mb-6">
       <h2 className="display mb-2 text-lg font-semibold">Recent payouts</h2>
-      <ul className="glass-card divide-y divide-[var(--inner-border)] rounded-3xl">
-        {rows.map((r) => (
-          <li key={r.key} className="flex items-center justify-between gap-3 px-4 py-3">
-            <div className="min-w-0 text-sm">
-              <a {...link(`/bounty/${r.id}`)} className="line-clamp-1 font-semibold hover:underline">
-                {r.title}
-              </a>
-              <div className="text-xs text-[var(--muted)]">
-                <PersonLink address={r.claimant} /> · {timeAgo(r.ts, now)}
+      {isLoading && ESCROW_ADDRESS ? (
+        <div className="h-24 animate-pulse rounded-3xl bg-surface/50" />
+      ) : rows.length === 0 ? (
+        <EmptyCard icon={Trophy}>No payouts yet. The first accepted claim will show up here.</EmptyCard>
+      ) : (
+        <ul className="glass-card divide-y divide-[var(--inner-border)] rounded-3xl">
+          {rows.map((r) => (
+            <li key={r.key} className="flex items-center justify-between gap-3 px-4 py-3 lg:px-5">
+              <div className="min-w-0 text-sm">
+                <a {...link(`/bounty/${r.id}`)} className="line-clamp-1 font-semibold hover:underline">
+                  {r.title}
+                </a>
+                <div className="text-xs text-[var(--muted)]">
+                  <PersonLink address={r.claimant} /> · {timeAgo(r.ts, now)}
+                </div>
               </div>
-            </div>
-            <span className="display shrink-0 text-lg font-bold tabular-nums" style={{ color: 'var(--success)' }}>
-              +{fmtUsdc(r.payout)}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span className="display shrink-0 text-lg font-bold tabular-nums" style={{ color: 'var(--success)' }}>
+                +{fmtUsdc(r.payout)} USDC
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
@@ -169,12 +203,10 @@ export function Home() {
         </Btn>
       </section>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
-        <LatestClaims list={data} />
-        <RecentPayouts />
-      </div>
+      <LatestClaims list={data} />
+      <RecentPayouts />
 
-      <div className="glass-inner mb-4 grid grid-cols-3 gap-1 rounded-2xl p-1 md:max-w-md" role="tablist">
+      <div id="bounties" className="glass-inner mb-4 grid scroll-mt-4 grid-cols-3 gap-1 rounded-2xl p-1 md:max-w-md lg:max-w-none" role="tablist">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -195,9 +227,19 @@ export function Home() {
         {isLoading && ESCROW_ADDRESS && [0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-3xl bg-surface/50" />)}
         {isError && <p className="col-span-full text-center text-sm text-[var(--danger)]">Couldn't load bounties. Check your connection and refresh.</p>}
         {!isLoading && !isError && items.length === 0 && ESCROW_ADDRESS && (
-          <div className="glass-inner col-span-full rounded-3xl p-8 text-center text-sm text-[var(--muted)]">
-            <active.icon className="mx-auto mb-2 size-6 text-[var(--subtle)]" />
-            {active.empty}
+          <div className="col-span-full">
+            <EmptyCard
+              icon={active.icon}
+              action={
+                active.id === 'open' ? (
+                  <Btn small onClick={openCreate}>
+                    <Plus className="size-4" /> Post a bounty
+                  </Btn>
+                ) : undefined
+              }
+            >
+              {active.empty}
+            </EmptyCard>
           </div>
         )}
         {items.map((item) => (

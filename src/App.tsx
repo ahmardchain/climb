@@ -64,7 +64,7 @@ export default function App() {
           <Header />
           <NetworkBanner />
           <main className={narrow}>{page}</main>
-          <footer className="mt-8 flex justify-center md:hidden">
+          <footer className="mt-10 flex justify-center">
             <StudioBadge />
           </footer>
         </div>
