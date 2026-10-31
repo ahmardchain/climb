@@ -11,8 +11,10 @@ import { buildAddressExplorerUrl } from '@/onchain-facts'
 import { useBountyDetail, useEvents, useWalletInfo, type BountyDetail } from '@/hooks/useClimbData'
 import { buildShareLink } from '@/lib/share'
 import { useClimbTx } from '@/hooks/useClimbTx'
-import { Btn, ProofPreview, Sheet, TxStatus, TypeBadge, fmtUsdc, useNow } from '@/components/ui'
+import { Btn, Sheet, TxStatus, TypeBadge, fmtUsdc, useNow } from '@/components/ui'
 import { CommentThread } from '@/components/CommentThread'
+import { ClaimNote } from '@/components/ClaimNote'
+import { ProofPreview } from '@/components/ProofImage'
 import { ClaimForm, ContributeForm, type Runner } from '@/components/BountyForms'
 import { VoteCard } from '@/components/VoteCard'
 
@@ -84,7 +86,7 @@ function ClaimCard({ claim, detail, me, isCreator, run, busy, cooldownLeft }: Cl
         </div>
       </div>
       <ProofPreview uri={claim.proofURI} />
-      {claim.note && <p className="text-pretty text-sm text-[var(--muted)]">{claim.note}</p>}
+      <ClaimNote note={claim.note} />
       {isCreator && bounty.status === Status.Active && !bounty.isOpen && (
         <Btn full tone="mint" busy={busy} onClick={() => act('acceptClaim', 'Accept and pay')}>
           Accept and pay {fmtUsdc(bounty.totalFunds)} USDC

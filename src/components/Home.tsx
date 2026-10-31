@@ -9,6 +9,7 @@ import { useAllClaims, useBountyList, useEvents, useWalletInfo } from '@/hooks/u
 import { useClimbTx } from '@/hooks/useClimbTx'
 import { Btn, TxStatus, fmtUsdc, useNow } from '@/components/ui'
 import { BountyCard } from '@/components/BountyCard'
+import { ProofImage } from '@/components/ProofImage'
 import { PersonLink, timeAgo } from '@/components/shared'
 
 const TABS = [
@@ -76,14 +77,13 @@ function LatestClaims({ list }: { list: ReturnType<typeof useBountyList>['data']
       <h2 className="display mb-2 text-lg font-semibold">Latest claims</h2>
       <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
         {withImages.map(({ claim, bounty }) => {
-          const url = classifyProof(claim.proofURI).url
           return (
             <a
               key={`${bounty.id}-${claim.id}`}
               {...link(`/bounty/${bounty.id}`)}
               className="glass-card relative block aspect-[4/5] w-40 shrink-0 snap-start overflow-hidden rounded-2xl"
             >
-              <img src={url?.href} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-full object-cover" />
+              <ProofImage uri={claim.proofURI} className="size-full object-cover" />
               <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2.5 text-xs font-semibold text-white">
                 <span className="line-clamp-2">{bounty.title}</span>
               </span>

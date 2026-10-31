@@ -6,6 +6,7 @@ import { buildPeople, lower, trending } from '@/lib/derive'
 import { useAllClaims, useBountyList, useEvents } from '@/hooks/useClimbData'
 import { fmtUsdc, useNow } from '@/components/ui'
 import { BountyCard } from '@/components/BountyCard'
+import { ProofImage } from '@/components/ProofImage'
 import { Empty, PageTitle, Skeletons, Tabs } from '@/components/shared'
 import { shortAddress } from '@/lib/climb'
 
@@ -148,8 +149,8 @@ export function ExplorePage({ route }: { route: Route }) {
                   {...link(`/bounty/${bounty.id}`)}
                   className="glass-card group relative block aspect-square overflow-hidden rounded-2xl"
                 >
-                  {p.kind === 'image' && p.url ? (
-                    <img src={p.url.href} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-full object-cover" />
+                  {p.kind === 'image' ? (
+                    <ProofImage uri={claim.proofURI} className="size-full object-cover" />
                   ) : (
                     <span className="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-[var(--muted)]">
                       <Link2 className="size-5" />

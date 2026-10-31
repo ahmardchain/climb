@@ -13,6 +13,8 @@ import { useAllClaims, useBountyList, useEvents } from '@/hooks/useClimbData'
 import { useClimbTx } from '@/hooks/useClimbTx'
 import { Btn, TxStatus, fmtUsdc } from '@/components/ui'
 import { BountyCard } from '@/components/BountyCard'
+import { ProofImage } from '@/components/ProofImage'
+import { parseNote } from '@/components/ClaimNote'
 import { Empty, Skeletons } from '@/components/shared'
 
 function usePending(address?: Address) {
@@ -140,14 +142,12 @@ export function ProfilePage({ param }: { param?: string }) {
               return (
                 <li key={`${bounty.id}-${claim.id}`}>
                   <a {...link(`/bounty/${bounty.id}`)} className="glass-card flex items-center gap-3 rounded-2xl p-3">
-                    {p.kind === 'image' && p.url ? (
-                      <img src={p.url.href} alt="" loading="lazy" referrerPolicy="no-referrer" className="size-14 shrink-0 rounded-xl object-cover" />
-                    ) : (
-                      <span className="glass-inner flex size-14 shrink-0 items-center justify-center rounded-xl text-[10px] text-[var(--muted)]">link</span>
-                    )}
+                    <span className="glass-inner flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl text-[10px] text-[var(--muted)]">
+                      {p.kind === 'image' ? <ProofImage uri={claim.proofURI} className="size-full object-cover" fallback="image" /> : 'link'}
+                    </span>
                     <span className="min-w-0 text-sm">
                       <span className="line-clamp-1 font-semibold">{bounty.title}</span>
-                      <span className="line-clamp-1 text-xs text-[var(--muted)]">{claim.note || p.url?.hostname || 'Proof link'}</span>
+                      <span className="line-clamp-1 text-xs text-[var(--muted)]">{parseNote(claim.note).title || parseNote(claim.note).description || p.url?.hostname || 'Proof link'}</span>
                     </span>
                   </a>
                 </li>

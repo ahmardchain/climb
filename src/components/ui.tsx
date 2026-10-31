@@ -1,9 +1,9 @@
 import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Check, ExternalLink, ImageOff, Link2, Loader2, X } from 'lucide-react'
+import { AlertTriangle, Check, ExternalLink, Loader2, X } from 'lucide-react'
 import { buildTxExplorerUrl } from '@/onchain-facts'
 import { formatUsdc } from '@/onchain-money'
-import { CHAIN_ID, classifyProof } from '@/lib/climb'
+import { CHAIN_ID } from '@/lib/climb'
 import type { TxState } from '@/hooks/useClimbTx'
 
 export function fmtUsdc(raw: bigint): string {
@@ -164,41 +164,5 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
-
-export function ProofPreview({ uri }: { uri: string }) {
-  const [broken, setBroken] = useState(false)
-  const { kind, url } = classifyProof(uri)
-
-  if (kind === 'invalid' || !url) {
-    return (
-      <div className="glass-inner flex items-center gap-2 rounded-2xl p-3 text-xs text-[var(--muted)]">
-        <Link2 className="size-4 shrink-0" />
-        <span className="break-all">{uri}</span>
-      </div>
-    )
-  }
-  if (kind === 'image' && !broken) {
-    return (
-      <a href={url.href} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-2xl border border-surface/70 bg-surface/50">
-        <img src={url.href} alt="Proof submitted by the claimant" loading="lazy" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="max-h-72 w-full object-cover" />
-      </a>
-    )
-  }
-  if (kind === 'video') {
-    return <video src={url.href} controls preload="metadata" className="max-h-72 w-full rounded-2xl bg-black/5" />
-  }
-  return (
-    <a href={url.href} target="_blank" rel="noopener noreferrer" className="glass-inner flex min-h-12 items-center gap-3 rounded-2xl p-3 hover:bg-surface/80">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface text-[var(--accent-hover)]">
-        {kind === 'image' ? <ImageOff className="size-4" /> : <Link2 className="size-4" />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold">{url.hostname}</span>
-        <span className="block truncate text-xs text-[var(--muted)]">{url.href}</span>
-      </span>
-      <ExternalLink className="size-4 shrink-0 text-[var(--subtle)]" />
-    </a>
   )
 }

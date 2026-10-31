@@ -1,6 +1,7 @@
 import { isAddress, type Address } from 'viem'
 import { arcTestnet } from 'viem/chains'
 import { getUsdc } from '@/onchain-facts'
+import { gatewayUrl, parseIpfs } from '@/lib/ipfs'
 
 export const CHAIN = arcTestnet
 export const CHAIN_ID = arcTestnet.id
@@ -138,7 +139,17 @@ const VIDEO_EXT = /\.(mp4|webm|mov)(\?.*)?$/i
 
 export type ProofKind = 'image' | 'video' | 'link' | 'invalid'
 
-export function classifyProof(uri: string): { kind: ProofKind; url?: URL } {
+export interface ProofInfo {
+  kind: ProofKind
+  /** The https URL for http(s) proofs, or the first gateway URL for ipfs:// proofs. */
+  url?: URL
+  /** IPFS path ("<cid>[/path]") when the proof is an ipfs:// link. */
+  ipfs?: string
+}
+
+export function classifyProof(uri: string): ProofInfo {
+  const ipfs = parseIpfs(uri)
+  if (ipfs) return { kind: 'image', ipfs, url: new URL(gatewayUrl(ipfs, 0)) }
   try {
     const url = new URL(uri.trim())
     if (url.protocol !== 'https:' && url.protocol !== 'http:') return { kind: 'invalid' }

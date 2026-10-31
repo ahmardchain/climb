@@ -7,7 +7,11 @@ import { climbEscrowAbi } from '@/lib/climbAbi'
 import { parseAmount } from '@/onchain-money'
 import type { WalletInfo } from '@/hooks/useClimbData'
 import type { TxStep } from '@/hooks/useClimbTx'
+import { Loader2 } from 'lucide-react'
+import { useImageUpload } from '@/hooks/useImageUpload'
 import { Btn, fmtUsdc } from '@/components/ui'
+import { ImagePicker } from '@/components/ImagePicker'
+import { NOTE_MAX_BYTES, TITLE_MAX_CHARS, encodeNote, noteBytes } from '@/components/ClaimNote'
 
 export type Runner = (title: string, steps: TxStep[]) => Promise<boolean>
 
@@ -75,46 +79,76 @@ export function ContributeForm({ bountyId, run, busy, wallet }: BaseProps & { wa
 export function ClaimForm({ bountyId, run, busy }: BaseProps) {
   const { isConnected } = useAccount()
   const { setOpen } = useModal()
-  const [proof, setProof] = useState('')
-  const [note, setNote] = useState('')
+  const upload = useImageUpload(() => setOpen(true))
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
 
-  const trimmed = proof.trim()
-  const urlOk = /^https?:\/\/\S+$/i.test(trimmed) && trimmed.length <= 512
+  const bytes = noteBytes(title, description)
+  const titleOk = title.trim().length > 0 && title.trim().length <= TITLE_MAX_CHARS
+  const noteOk = bytes <= NOTE_MAX_BYTES
+  const ready = upload.status === 'done' && !!upload.cid && titleOk && noteOk
 
   const submit = async () => {
     if (!isConnected) return setOpen(true)
-    if (!ESCROW_ADDRESS || !urlOk) return
+    if (!ESCROW_ADDRESS || !ready || !upload.cid) return
     const ok = await run('Submit claim', [
-      { label: 'Submit proof', address: ESCROW_ADDRESS, abi: climbEscrowAbi, functionName: 'submitClaim', args: [bountyId, trimmed, note.trim()] },
+      {
+        label: 'Submit proof',
+        address: ESCROW_ADDRESS,
+        abi: climbEscrowAbi,
+        functionName: 'submitClaim',
+        args: [bountyId, `ipfs://${upload.cid}`, encodeNote(title, description)],
+      },
     ])
     if (ok) {
-      setProof('')
-      setNote('')
+      upload.clear()
+      setTitle('')
+      setDescription('')
     }
   }
 
+  let label = 'Submit claim'
+  if (!isConnected) label = 'Connect wallet'
+  else if (upload.status === 'signing') label = 'Waiting for signature…'
+  else if (upload.status === 'uploading') label = 'Uploading…'
+  else if (upload.status !== 'done') label = 'Add an image to continue'
+  else if (!titleOk) label = 'Add a title to continue'
+
   return (
-    <div className="space-y-2">
-      <input
-        value={proof}
-        onChange={(e) => setProof(e.target.value)}
-        placeholder="https://link-to-your-photo-video-or-post"
-        inputMode="url"
-        aria-label="Proof link"
-        className="glass-inner min-h-12 w-full rounded-2xl px-4 text-sm outline-none"
-      />
-      <textarea
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        maxLength={500}
-        rows={2}
-        placeholder="Add a short note (optional)"
-        aria-label="Note"
-        className="glass-inner w-full resize-none rounded-2xl px-4 py-3 text-sm outline-none"
-      />
-      {trimmed && !urlOk && <p className="text-xs text-[var(--danger)]">Paste a link that starts with https://</p>}
-      <Btn full tone="pop" busy={busy} disabled={isConnected && !urlOk} onClick={submit}>
-        {isConnected ? 'Submit proof' : 'Connect wallet'}
+    <div className="space-y-3">
+      <ImagePicker upload={upload} />
+      <label className="block">
+        <span className="mb-1 flex justify-between text-xs font-semibold text-[var(--muted)]">
+          Claim title
+          <span className="tabular-nums text-[var(--subtle)]">
+            {title.length}/{TITLE_MAX_CHARS}
+          </span>
+        </span>
+        <input
+          value={title}
+          maxLength={TITLE_MAX_CHARS}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Finished the 5km before sunrise"
+          className="glass-inner min-h-12 w-full rounded-2xl px-4 text-sm outline-none"
+        />
+      </label>
+      <label className="block">
+        <span className="mb-1 block text-xs font-semibold text-[var(--muted)]">Description (optional, links welcome)</span>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          placeholder="Tell the story, or paste a link to a post or video."
+          className="glass-inner w-full resize-none rounded-2xl px-4 py-3 text-sm outline-none"
+        />
+        <span className={`mt-1 block text-right text-xs tabular-nums ${noteOk ? 'text-[var(--subtle)]' : 'text-[var(--danger)]'}`}>
+          {bytes}/{NOTE_MAX_BYTES} bytes
+        </span>
+      </label>
+      {!noteOk && <p className="text-xs text-[var(--danger)]">Shorten the title or description. Claims are limited to {NOTE_MAX_BYTES} bytes.</p>}
+      <Btn full tone="pop" busy={busy} disabled={isConnected && !ready} onClick={submit}>
+        {(upload.status === 'uploading' || upload.status === 'signing') && <Loader2 className="size-4 animate-spin" />}
+        {label}
       </Btn>
     </div>
   )
