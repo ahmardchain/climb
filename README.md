@@ -4,7 +4,7 @@
 
 Built with [Arc Studio](https://studio.arc.io), live on **Arc mainnet**.
 
-![Climb home page](docs/screenshots/home.jpg)
+![Climb home page](docs/screenshots/home.png)
 
 ## Links
 
@@ -24,7 +24,7 @@ The first bounty on Arc mainnet ran the full flow through the contract and the a
 2. [`submitClaim`](https://explorer.arc.io/tx/0x01d8140948452a4489841f0677ac28857821855881667c8d27efa0915d704f66): a second wallet submitted photo proof, stored on IPFS.
 3. [`acceptClaim`](https://explorer.arc.io/tx/0xf377691747a8bd35ed58c6f790ad5a84a223ea1750ca54361d9112e97b578940): the creator accepted it. The contract sent 0.975 USDC to the claimant and the 0.025 USDC fee (2.5%) to the treasury in one transaction.
 
-![A paid bounty](docs/screenshots/bounty.jpg)
+![A paid bounty](docs/screenshots/bounty.png)
 
 ## How it works
 
