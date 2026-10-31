@@ -176,7 +176,8 @@ export function BountyPage({ id }: { id: bigint }) {
   return (
     <div className="space-y-4">
       {back}
-
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-start">
+        <div className="lg:col-start-1 lg:row-start-1">
       <section className="glass-card rounded-3xl p-5">
         <div className="mb-3 flex items-center gap-2">
           <TypeBadge isOpen={bounty.isOpen} />
@@ -233,7 +234,8 @@ export function BountyPage({ id }: { id: bigint }) {
           </p>
         )}
       </section>
-
+        </div>
+        <div className="space-y-4 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
       <TxStatus state={state} onDismiss={reset} />
 
       {voting && <VoteCard bounty={bounty} myContribution={myContribution} iVoted={iVoted} connected={isConnected} run={run} busy={busy} />}
@@ -335,7 +337,8 @@ export function BountyPage({ id }: { id: bigint }) {
           </ul>
         </section>
       )}
-
+        </div>
+        <div className="space-y-4 lg:col-start-1 lg:row-start-2">
       <section>
         <h2 className="display mb-3 text-lg font-semibold">
           Claims <span className="text-[var(--subtle)]">({claims.length})</span>
@@ -352,6 +355,8 @@ export function BountyPage({ id }: { id: bigint }) {
       </section>
 
       <CommentThread bountyId={bounty.id} events={store?.events ?? []} run={run} busy={busy} />
+        </div>
+      </div>
 
       <Sheet open={fundOpen} onClose={() => !busy && setFundOpen(false)} label="Add funds">
         <h2 className="display mb-1 text-2xl font-bold">Add funds</h2>

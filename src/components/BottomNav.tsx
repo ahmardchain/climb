@@ -25,7 +25,7 @@ export function BottomNav({ path, onBountyPage }: Props) {
   )
 
   return (
-    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[max(env(safe-area-inset-bottom),8px)]">
+    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[max(env(safe-area-inset-bottom),8px)] lg:hidden">
       <div className="glass-card relative flex w-full max-w-md items-end rounded-3xl px-2">
         {tab('/', 'Home', Home, (p) => p === '/')}
         {tab('/feed', 'Feed', Newspaper, (p) => p === '/feed')}

@@ -117,7 +117,7 @@ export function ProfilePage({ param }: { param?: string }) {
       {isLoading ? (
         <Skeletons n={2} h="h-20" />
       ) : (
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-5">
           <Stat label="Total earned" value={fmtUsdc(stats.earned)} unit="USDC" />
           <Stat label="Total funded" value={fmtUsdc(stats.funded > 0n ? stats.funded : 0n)} unit="USDC" />
           <Stat label="Wins" value={String(stats.wins)} />
@@ -128,7 +128,7 @@ export function ProfilePage({ param }: { param?: string }) {
 
       <section>
         <h2 className="display mb-2 text-lg font-semibold">Bounties created</h2>
-        {created.length === 0 ? <Empty>No bounties yet.</Empty> : <div className="space-y-3">{created.map((i) => <BountyCard key={i.bounty.id.toString()} item={i} />)}</div>}
+        {created.length === 0 ? <Empty>No bounties yet.</Empty> : <div className="grid gap-3 md:grid-cols-2">{created.map((i) => <BountyCard key={i.bounty.id.toString()} item={i} />)}</div>}
       </section>
 
       <section>

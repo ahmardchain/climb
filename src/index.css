@@ -36,6 +36,14 @@
   --sky-tint: rgba(133, 177, 237, 0.26);
   --sun-tint: rgba(255, 205, 131, 0.45);
   --danger-tint: rgba(214, 69, 93, 0.14);
+  /* Keeps the Arc Studio badge above the bottom nav on small screens. */
+  --wm-bottom: 104px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --wm-bottom: 16px;
+  }
 }
 
 .dark {

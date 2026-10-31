@@ -137,7 +137,7 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center"
+          className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -147,7 +147,7 @@ export function Sheet({ open, onClose, children, label }: { open: boolean; onClo
           <motion.section
             role="dialog"
             aria-label={label}
-            className="relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl"
+            className="relative max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl md:max-w-lg md:rounded-3xl"
             style={{ background: 'var(--sheet-bg)', backdropFilter: 'blur(40px) saturate(200%)' }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}

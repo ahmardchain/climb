@@ -41,6 +41,8 @@ export default function App() {
     [theme, toggle],
   )
 
+  const narrow = path === '/feed' || path === '/leaderboard' ? 'mx-auto max-w-2xl' : path === '/analytics' || profileMatch ? 'mx-auto max-w-3xl' : ''
+
   let page
   if (bountyId !== null) page = <BountyPage id={bountyId} />
   else if (profileMatch) page = <ProfilePage param={profileMatch[1]} />
@@ -57,10 +59,10 @@ export default function App() {
           <div style={{ position: 'absolute', top: '6%', left: '-4%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, var(--blob-a) 0%, transparent 70%)', filter: 'blur(60px)' }} />
           <div style={{ position: 'absolute', bottom: '12%', right: '-4%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, var(--blob-b) 0%, transparent 70%)', filter: 'blur(58px)' }} />
         </div>
-        <div className="relative z-10 mx-auto max-w-md px-4 pb-36 pt-4">
+        <div className="relative z-10 mx-auto w-full max-w-md px-4 pb-36 pt-4 md:max-w-3xl md:px-6 lg:max-w-6xl lg:pb-12">
           <Header />
           <NetworkBanner />
-          <main>{page}</main>
+          <main className={narrow}>{page}</main>
         </div>
       </div>
 

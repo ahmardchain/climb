@@ -157,20 +157,24 @@ export function Home() {
   return (
     <div>
       <PendingBanner />
-      <section className="glass-card mb-5 rounded-3xl p-5">
+      <section className="glass-card mb-5 rounded-3xl p-5 lg:flex lg:items-center lg:justify-between lg:gap-8 lg:p-8">
+        <div className="lg:max-w-xl">
         <RotatingHeadline />
         <p className="mt-3 text-pretty text-sm text-[var(--muted)]">
           Post a task with a USDC reward held in escrow. Others send proof. The reward is paid out onchain when the proof is accepted.
         </p>
-        <Btn full className="mt-4" onClick={openCreate} disabled={!ESCROW_ADDRESS}>
+        </div>
+        <Btn full className="mt-4 lg:mt-0 lg:w-auto lg:shrink-0 lg:px-8" onClick={openCreate} disabled={!ESCROW_ADDRESS}>
           <Plus className="size-4" /> Post a bounty
         </Btn>
       </section>
 
-      <LatestClaims list={data} />
-      <RecentPayouts />
+      <div className="lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
+        <LatestClaims list={data} />
+        <RecentPayouts />
+      </div>
 
-      <div className="glass-inner mb-4 grid grid-cols-3 gap-1 rounded-2xl p-1" role="tablist">
+      <div className="glass-inner mb-4 grid grid-cols-3 gap-1 rounded-2xl p-1 md:max-w-md" role="tablist">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -187,11 +191,11 @@ export function Home() {
         ))}
       </div>
 
-      <div className="space-y-3">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {isLoading && ESCROW_ADDRESS && [0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-3xl bg-surface/50" />)}
-        {isError && <p className="text-center text-sm text-[var(--danger)]">Couldn't load bounties. Check your connection and refresh.</p>}
+        {isError && <p className="col-span-full text-center text-sm text-[var(--danger)]">Couldn't load bounties. Check your connection and refresh.</p>}
         {!isLoading && !isError && items.length === 0 && ESCROW_ADDRESS && (
-          <div className="glass-inner rounded-3xl p-8 text-center text-sm text-[var(--muted)]">
+          <div className="glass-inner col-span-full rounded-3xl p-8 text-center text-sm text-[var(--muted)]">
             <active.icon className="mx-auto mb-2 size-6 text-[var(--subtle)]" />
             {active.empty}
           </div>

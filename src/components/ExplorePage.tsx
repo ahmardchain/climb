@@ -128,8 +128,8 @@ export function ExplorePage({ route }: { route: Route }) {
       {isLoading && <Skeletons />}
 
       {tab === 'bounties' && (
-        <div className="space-y-3">
-          {!isLoading && bounties.length === 0 && <Empty>{isTrending ? 'Nothing has been funded in the last 7 days.' : 'No bounties match.'}</Empty>}
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {!isLoading && bounties.length === 0 && <div className="col-span-full"><Empty>{isTrending ? 'Nothing has been funded in the last 7 days.' : 'No bounties match.'}</Empty></div>}
           {bounties.map(({ item, note }) => (
             <BountyCard key={item.bounty.id.toString()} item={item} note={note} />
           ))}
@@ -140,7 +140,7 @@ export function ExplorePage({ route }: { route: Route }) {
         (claimRows.length === 0 ? (
           <Empty>No claims match.</Empty>
         ) : (
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 lg:grid-cols-6">
             {claimRows.map(({ claim, bounty }) => {
               const p = classifyProof(claim.proofURI)
               return (
@@ -170,7 +170,7 @@ export function ExplorePage({ route }: { route: Route }) {
         (users.length === 0 ? (
           <Empty>No users match.</Empty>
         ) : (
-          <ul className="space-y-2.5">
+          <ul className="grid gap-2.5 md:grid-cols-2 lg:grid-cols-3">
             {users.slice(0, 50).map((p) => (
               <li key={p.address}>
                 <a {...link(`/profile/${p.address}`)} className="glass-card flex min-h-16 items-center justify-between gap-3 rounded-2xl p-3.5">
