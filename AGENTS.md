@@ -56,3 +56,7 @@ bun run dev
 - Display: `src/components/ProofImage.tsx` tries gateways in order (`src/lib/ipfs.ts`). https proofs keep the old image/link-card behaviour.
 - The static Vercel deploy via the deploy tool does not run `/api/upload` or hold `PINATA_JWT`; hosting uploads needs a Vercel project with the env var set.
 - Upload protection: the client signs `uploadMessage(address, timestamp)` (`api/_lib/auth.ts`); the server rebuilds the message, verifies the EOA signature (5 minute TTL), then rate limits 10/wallet/hour and 20/IP/hour (`api/_lib/ratelimit.ts`; Upstash/Vercel KV REST when configured, per-instance memory otherwise). Smart-contract wallets (ERC-1271) are not supported for uploads.
+
+## Mainnet
+- App supports Arc mainnet (chain 5042) via `VITE_CLIMB_NETWORK=mainnet`; default remains Arc Testnet. Mainnet USDC `0x3600000000000000000000000000000000000000` verified onchain (symbol USDC, 6 decimals).
+- Arc Studio does not deploy to mainnet. The user deploys ClimbEscrow from their own wallet following `docs/mainnet-deploy.md`. No mainnet contract exists yet; the deployed contract in this file is Arc Testnet only.

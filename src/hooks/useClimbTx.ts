@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useAccount, usePublicClient, useSwitchChain, useWriteContract } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Abi, Address } from 'viem'
-import { CHAIN_ID, friendlyError, isUserRejection } from '@/lib/climb'
+import { CHAIN, CHAIN_ID, friendlyError, isUserRejection } from '@/lib/climb'
 
 export interface TxStep {
   label: string
@@ -51,7 +51,7 @@ export function useClimbTx() {
       const base = { title, stepCount: steps.length }
       try {
         if (chainId !== CHAIN_ID) {
-          setState({ ...base, phase: 'wallet', step: 'Switch to Arc Testnet', stepIndex: 0, hashes })
+          setState({ ...base, phase: 'wallet', step: `Switch to ${CHAIN.name}`, stepIndex: 0, hashes })
           await switchChainAsync({ chainId: CHAIN_ID })
         }
         for (let i = 0; i < steps.length; i++) {

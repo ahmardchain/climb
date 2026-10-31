@@ -1,10 +1,13 @@
 import { isAddress, type Address } from 'viem'
-import { arcTestnet } from 'viem/chains'
+import { arc, arcTestnet } from 'viem/chains'
 import { getUsdc } from '@/onchain-facts'
 import { gatewayUrl, parseIpfs } from '@/lib/ipfs'
 
-export const CHAIN = arcTestnet
-export const CHAIN_ID = arcTestnet.id
+/** Set VITE_CLIMB_NETWORK=mainnet to run against Arc mainnet. Anything else means Arc Testnet. */
+export const IS_MAINNET = (import.meta.env.VITE_CLIMB_NETWORK as string | undefined) === 'mainnet'
+export const CHAIN = IS_MAINNET ? arc : arcTestnet
+export const CHAIN_ID = CHAIN.id
+export const NEED_FUNDS_HINT = IS_MAINNET ? 'Add USDC to your wallet first.' : 'Get test USDC from the Arc Studio sidebar.'
 
 const rawEscrow = import.meta.env.VITE_CLIMB_ESCROW_ADDRESS as string | undefined
 export const ESCROW_ADDRESS: Address | undefined =
@@ -14,7 +17,7 @@ const rawDeployBlock = import.meta.env.VITE_CLIMB_DEPLOY_BLOCK as string | undef
 export const DEPLOY_BLOCK: bigint | undefined = rawDeployBlock && /^\d+$/.test(rawDeployBlock) ? BigInt(rawDeployBlock) : undefined
 
 const usdcFact = getUsdc(CHAIN_ID)
-if (!usdcFact) throw new Error('USDC is missing from the onchain facts for Arc Testnet')
+if (!usdcFact) throw new Error(`USDC is missing from the onchain facts for ${CHAIN.name}`)
 export const USDC_ADDRESS = usdcFact.address as Address
 
 export const CATEGORIES = ['Fitness', 'Creative', 'Gaming', 'Learning', 'Community', 'Tech', 'Food', 'Other'] as const
@@ -124,7 +127,7 @@ export function friendlyError(err: unknown): string {
   if (name && FRIENDLY_ERRORS[name]) return FRIENDLY_ERRORS[name]
   const msg = ((err as ErrorLike)?.shortMessage ?? (err as ErrorLike)?.message ?? '').toLowerCase()
   if (msg.includes('insufficient funds for gas') || msg.includes('exceeds the balance of the account'))
-    return "You don't have enough USDC to cover gas. Use Get test USDC in the Arc Studio sidebar."
+    return `You don't have enough USDC to cover gas. ${NEED_FUNDS_HINT}`
   if (msg.includes('transfer amount exceeds balance') || msg.includes('insufficient balance') || msg.includes('erc20insufficientbalance'))
     return "You don't have enough USDC for that amount."
   if (msg.includes('allowance')) return 'USDC approval is missing. Approve the amount first.'

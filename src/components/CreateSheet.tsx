@@ -3,7 +3,7 @@ import { useAccount } from 'wagmi'
 import { useModal } from 'connectkit'
 import { erc20Abi } from 'viem'
 import { Users, User } from 'lucide-react'
-import { CATEGORIES, CHAIN_ID, ESCROW_ADDRESS, MIN_CREATE, USDC_ADDRESS } from '@/lib/climb'
+import { CATEGORIES, CHAIN_ID, ESCROW_ADDRESS, MIN_CREATE, NEED_FUNDS_HINT, USDC_ADDRESS } from '@/lib/climb'
 import { climbEscrowAbi } from '@/lib/climbAbi'
 import { formatUsdc, parseAmount } from '@/onchain-money'
 import { useWalletInfo } from '@/hooks/useClimbData'
@@ -47,7 +47,7 @@ export function CreateSheet({ open, onClose, onCreated }: Props) {
   let hint: string | null = null
   if (reward && raw === null) hint = 'Enter a valid amount with up to 6 decimals.'
   else if (raw !== null && raw < MIN_CREATE) hint = 'The minimum reward is 1 USDC.'
-  else if (raw !== null && isConnected && !enough) hint = `You have ${fmtUsdc(balance)} USDC. Get test USDC from the Arc Studio sidebar.`
+  else if (raw !== null && isConnected && !enough) hint = `You have ${fmtUsdc(balance)} USDC. ${NEED_FUNDS_HINT}`
 
   const submit = async () => {
     if (!isConnected) return openConnect(true)
