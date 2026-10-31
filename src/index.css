@@ -46,6 +46,13 @@
   }
 }
 
+/* The floating Arc Studio badge overlaps content on phones, so it lives in the menu and page footer there. */
+@media (max-width: 767px) {
+  .studio-watermark {
+    display: none !important;
+  }
+}
+
 .dark {
   color-scheme: dark;
   --ink: #eef2fb;

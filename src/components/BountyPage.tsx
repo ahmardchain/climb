@@ -8,7 +8,7 @@ import { ESCROW_ADDRESS, Status, sameAddress, shortAddress, timeLeft, type Claim
 import { climbEscrowAbi } from '@/lib/climbAbi'
 import { CHAIN_ID } from '@/lib/climb'
 import { buildAddressExplorerUrl } from '@/onchain-facts'
-import { useBountyDetail, useEvents, useWalletInfo, type BountyDetail } from '@/hooks/useClimbData'
+import { useBountyDetail, useEvents, usePaidInfo, useWalletInfo, type BountyDetail } from '@/hooks/useClimbData'
 import { buildShareLink } from '@/lib/share'
 import { useClimbTx } from '@/hooks/useClimbTx'
 import { Btn, Sheet, TxStatus, TypeBadge, fmtUsdc, useNow } from '@/components/ui'
@@ -60,7 +60,8 @@ interface ClaimCardProps {
 function ClaimCard({ claim, detail, me, isCreator, run, busy, cooldownLeft }: ClaimCardProps) {
   const { bounty } = detail
   const nominated = (bounty.status === Status.Voting || bounty.status === Status.Paid) && bounty.isOpen && bounty.nominatedClaimId === claim.id
-  const isWinner = bounty.status === Status.Paid && (detail.winner ? detail.winner.claimId === claim.id : bounty.isOpen && nominated)
+  const winner = usePaidInfo().get(bounty.id.toString())
+  const isWinner = bounty.status === Status.Paid && (winner ? winner.claimId === claim.id : bounty.isOpen && nominated)
   const act = (fn: 'acceptClaim' | 'nominateClaim', title: string) =>
     ESCROW_ADDRESS && run(title, [{ label: title, address: ESCROW_ADDRESS, abi: climbEscrowAbi, functionName: fn, args: [bounty.id, claim.id] }])
 
@@ -117,6 +118,7 @@ export function BountyPage({ id }: { id: bigint }) {
   const [shareUrl, setShareUrl] = useState<string>()
   const [copied, setCopied] = useState(false)
   const { data: store } = useEvents()
+  const winner = usePaidInfo().get(id.toString())
 
   useEffect(() => {
     let live = true
@@ -194,7 +196,7 @@ export function BountyPage({ id }: { id: bigint }) {
             <div className="flex items-baseline gap-1.5">
               <TokenUSDC variant="branded" size={24} className="self-center" />
               <span className="display text-4xl font-bold tabular-nums">
-                {fmtUsdc(bounty.status === Status.Paid && detail.winner ? detail.winner.payout + detail.winner.fee : bounty.totalFunds)}
+                {fmtUsdc(bounty.status === Status.Paid ? (winner ? winner.payout + winner.fee : 0n) : bounty.totalFunds)}
               </span>
               <span className="text-sm font-medium text-[var(--subtle)]">USDC</span>
             </div>
@@ -228,9 +230,9 @@ export function BountyPage({ id }: { id: bigint }) {
             {copied ? <Check className="size-4" /> : <Share2 className="size-4" />} {copied ? 'Copied' : 'Share'}
           </Btn>
         </div>
-        {detail.winner && (
+        {winner && (
           <p className="mt-3 text-xs text-[var(--muted)]">
-            {fmtUsdc(detail.winner.payout)} USDC went to <AddressLink address={detail.winner.claimant} />. Platform fee: {fmtUsdc(detail.winner.fee)} USDC.
+            {fmtUsdc(winner.payout)} USDC went to <AddressLink address={winner.claimant} />. Platform fee: {fmtUsdc(winner.fee)} USDC.
           </p>
         )}
       </section>

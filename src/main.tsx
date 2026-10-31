@@ -24,7 +24,15 @@ import App from './App'
 import { installShareSync } from './lib/share'
 import './index.css'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 15_000),
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 // Studio logo SVG
 const StudioLogo = () => (
@@ -36,6 +44,7 @@ const StudioLogo = () => (
 // Studio watermark component - links back to Studio
 const StudioWatermark = () => (
   <a
+    className="studio-watermark"
     href="https://studio.arc.io/"
     target="_blank"
     rel="noopener noreferrer"

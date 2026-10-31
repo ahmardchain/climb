@@ -34,13 +34,18 @@ const bitget = injected({
   },
 })
 
+// 429s and 5xx are retried with exponential backoff (400ms, 800ms, 1.6s, ...).
+const RETRY = { retryCount: 5, retryDelay: 400 }
+
 export const config = createConfig({
   chains: [CHAIN, mainnet], // mainnet needed for ENS resolution
   // injected() covers MetaMask and any other wallet announced through EIP-6963.
   connectors: [injected(), bitget],
+  // Reads issued in the same moment are combined into one multicall request.
+  batch: { multicall: { wait: 25 } },
   transports: {
-    [arc.id]: http(arc.rpcUrls.default.http[0]),
-    [arcTestnet.id]: http(arcTestnet.rpcUrls.default.http[0]),
-    [mainnet.id]: http(), // ENS resolution uses mainnet
+    [arc.id]: http(arc.rpcUrls.default.http[0], RETRY),
+    [arcTestnet.id]: http(arcTestnet.rpcUrls.default.http[0], RETRY),
+    [mainnet.id]: http(undefined, RETRY), // ENS resolution uses mainnet
   },
 })

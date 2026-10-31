@@ -6,6 +6,7 @@ import { link } from '@/lib/router'
 import { buildAnalytics } from '@/lib/derive'
 import { useBountyList, useEvents } from '@/hooks/useClimbData'
 import { fmtUsdc, useNow } from '@/components/ui'
+import { StudioBadge } from '@/components/shared'
 
 interface Props {
   open: boolean
@@ -136,6 +137,9 @@ export function Sidebar({ open, onClose, onHow, path }: Props) {
                 <span className="text-xs text-[var(--subtle)]">USDC volume</span>
               </div>
               <div className="mt-1 text-sm tabular-nums text-[var(--muted)]">{month.totalTx} transactions</div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <StudioBadge />
             </div>
           </motion.aside>
         </motion.div>

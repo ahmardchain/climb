@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAccount, usePublicClient } from 'wagmi'
 import { erc20Abi, type Address, type PublicClient } from 'viem'
@@ -5,10 +6,8 @@ import { climbEscrowAbi } from '@/lib/climbAbi'
 import { syncEvents } from '@/lib/eventStore'
 import {
   CHAIN_ID,
-  DEPLOY_BLOCK,
   ESCROW_ADDRESS,
   USDC_ADDRESS,
-  Status,
   type Bounty,
   type Claim,
 } from '@/lib/climb'
@@ -29,7 +28,7 @@ export function useBountyList() {
   return useQuery({
     queryKey: ['climb', 'list'],
     enabled: !!client && !!ESCROW_ADDRESS,
-    refetchInterval: 15_000,
+    refetchInterval: 30_000,
     queryFn: async (): Promise<BountyListItem[]> => {
       if (!client || !ESCROW_ADDRESS) return []
       const escrow = ESCROW_ADDRESS
@@ -68,7 +67,6 @@ export interface BountyDetail {
   iClaimed: boolean
   iVoted: boolean
   nominationAvailableAt: bigint
-  winner?: { claimId: bigint; claimant: Address; payout: bigint; fee: bigint }
 }
 
 export function useBountyDetail(id: bigint | undefined) {
@@ -77,7 +75,7 @@ export function useBountyDetail(id: bigint | undefined) {
   return useQuery({
     queryKey: ['climb', 'bounty', id?.toString(), address],
     enabled: !!client && !!ESCROW_ADDRESS && id !== undefined,
-    refetchInterval: 10_000,
+    refetchInterval: 20_000,
     queryFn: async (): Promise<BountyDetail | null> => {
       if (!client || !ESCROW_ADDRESS || id === undefined) return null
       const escrow = ESCROW_ADDRESS
@@ -116,25 +114,7 @@ export function useBountyDetail(id: bigint | undefined) {
         ])) as [bigint, boolean, boolean]
       }
 
-      let winner: BountyDetail['winner']
-      if (bounty.status === Status.Paid && DEPLOY_BLOCK !== undefined) {
-        try {
-          const logs = await client.getContractEvents({
-            address: ESCROW_ADDRESS,
-            abi: climbEscrowAbi,
-            eventName: 'BountyPaid',
-            args: { bountyId: id },
-            fromBlock: DEPLOY_BLOCK,
-          })
-          const log = logs[logs.length - 1]
-          if (log?.args.claimId !== undefined && log.args.claimant && log.args.payout !== undefined && log.args.fee !== undefined) {
-            winner = { claimId: log.args.claimId, claimant: log.args.claimant, payout: log.args.payout, fee: log.args.fee }
-          }
-        } catch {
-          // The explorer link is the fallback when the RPC rejects the log range.
-        }
-      }
-      return { bounty, claims, contributors, myContribution, iClaimed, iVoted, nominationAvailableAt, winner }
+      return { bounty, claims, contributors, myContribution, iClaimed, iVoted, nominationAvailableAt }
     },
   })
 }
@@ -152,7 +132,7 @@ export function useWalletInfo() {
   return useQuery({
     queryKey: ['climb', 'wallet', address],
     enabled: !!client && !!ESCROW_ADDRESS,
-    refetchInterval: 15_000,
+    refetchInterval: 30_000,
     queryFn: async (): Promise<WalletInfo> => {
       if (!client || !ESCROW_ADDRESS) return { balance: 0n, allowance: 0n, pending: 0n, feeBps: 0 }
       const escrow = ESCROW_ADDRESS
@@ -173,7 +153,7 @@ export function useEvents() {
   return useQuery({
     queryKey: ['climb', 'events'],
     enabled: !!client && !!ESCROW_ADDRESS,
-    refetchInterval: 15_000,
+    refetchInterval: 30_000,
     staleTime: 5_000,
     queryFn: () => syncEvents(client as PublicClient),
   })
@@ -209,4 +189,33 @@ export function useAllClaims(list: BountyListItem[] | undefined) {
       return pages.flat().sort((a, b) => (b.claim.createdAt > a.claim.createdAt ? 1 : b.claim.createdAt < a.claim.createdAt ? -1 : 0))
     },
   })
+}
+
+export interface PaidInfo {
+  claimId: bigint
+  claimant: Address
+  payout: bigint
+  fee: bigint
+}
+
+/** What each paid bounty paid out, by bounty id, read from BountyPaid events. totalFunds is zeroed onchain at payout. */
+export function usePaidInfo(): Map<string, PaidInfo> {
+  const { data } = useEvents()
+  return useMemo(() => {
+    const m = new Map<string, PaidInfo>()
+    for (const e of data?.events ?? []) {
+      if (e.name !== 'BountyPaid') continue
+      const { bountyId, claimId, claimant, payout, fee } = e.args
+      if (typeof bountyId === 'bigint' && typeof claimId === 'bigint' && typeof claimant === 'string' && typeof payout === 'bigint' && typeof fee === 'bigint') {
+        m.set(bountyId.toString(), { claimId, claimant: claimant as Address, payout, fee })
+      }
+    }
+    return m
+  }, [data])
+}
+
+/** Gross reward (payout + fee) of every paid bounty, by bounty id. */
+export function usePaidAmounts(): Map<string, bigint> {
+  const info = usePaidInfo()
+  return useMemo(() => new Map([...info].map(([id, p]) => [id, p.payout + p.fee])), [info])
 }

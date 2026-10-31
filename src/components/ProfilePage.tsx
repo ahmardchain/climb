@@ -22,7 +22,7 @@ function usePending(address?: Address) {
   return useQuery({
     queryKey: ['climb', 'pending', address],
     enabled: !!client && !!ESCROW_ADDRESS && !!address,
-    refetchInterval: 15_000,
+    refetchInterval: 30_000,
     queryFn: async () => {
       if (!client || !ESCROW_ADDRESS || !address) return 0n
       return client.readContract({ address: ESCROW_ADDRESS, abi: climbEscrowAbi, functionName: 'pendingPayouts', args: [address] })

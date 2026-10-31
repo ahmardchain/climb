@@ -2,15 +2,15 @@ import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from '
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Check, ExternalLink, Loader2, X } from 'lucide-react'
 import { buildTxExplorerUrl } from '@/onchain-facts'
-import { formatUsdc } from '@/onchain-money'
 import { CHAIN_ID } from '@/lib/climb'
 import type { TxState } from '@/hooks/useClimbTx'
 
+/** USDC for display: at most 2 decimals, rounded (e.g. "1.57"). Tiny non-zero amounts read "<0.01". */
 export function fmtUsdc(raw: bigint): string {
-  const s = formatUsdc(raw)
-  if (!s.includes('.')) return `${s}.00`
-  const frac = s.split('.')[1]
-  return frac.length === 1 ? `${s}0` : s
+  if (raw < 0n) return `-${fmtUsdc(-raw)}`
+  if (raw > 0n && raw < 5000n) return '<0.01'
+  const cents = (raw + 5000n) / 10000n
+  return `${cents / 100n}.${(cents % 100n).toString().padStart(2, '0')}`
 }
 
 export function useNow(intervalMs = 1000): number {

@@ -60,3 +60,16 @@ export function Skeletons({ n = 3, h = 'h-20' }: { n?: number; h?: string }) {
     </div>
   )
 }
+
+export function StudioBadge({ className = '' }: { className?: string }) {
+  return (
+    <a
+      href="https://studio.arc.io/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--subtle)] hover:text-[var(--muted)] ${className}`}
+    >
+      Built with Arc Studio
+    </a>
+  )
+}

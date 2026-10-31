@@ -15,6 +15,7 @@ import { LeaderboardPage } from '@/components/LeaderboardPage'
 import { ExplorePage } from '@/components/ExplorePage'
 import { ProfilePage } from '@/components/ProfilePage'
 import { AnalyticsPage } from '@/components/AnalyticsPage'
+import { StudioBadge } from '@/components/shared'
 
 export default function App() {
   const route = useRoute()
@@ -63,6 +64,9 @@ export default function App() {
           <Header />
           <NetworkBanner />
           <main className={narrow}>{page}</main>
+          <footer className="mt-8 flex justify-center md:hidden">
+            <StudioBadge />
+          </footer>
         </div>
       </div>
 
