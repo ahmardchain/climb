@@ -1,4 +1,4 @@
-import { handleUpload } from './_lib/upload'
+import { handleUpload } from './_lib/upload.js'
 
 /**
  * Vercel serverless route: POST /api/upload (multipart, field "file") -> { cid }.

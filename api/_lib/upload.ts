@@ -1,6 +1,6 @@
 import { getAddress, isAddress, verifyMessage } from 'viem'
-import { CLOCK_SKEW_SECONDS, IP_LIMIT_PER_HOUR, SIGNATURE_TTL_SECONDS, WALLET_LIMIT_PER_HOUR, uploadMessage } from './auth'
-import { consume, formatWait, type Env } from './ratelimit'
+import { CLOCK_SKEW_SECONDS, IP_LIMIT_PER_HOUR, SIGNATURE_TTL_SECONDS, WALLET_LIMIT_PER_HOUR, uploadMessage } from './auth.js'
+import { consume, formatWait, type Env } from './ratelimit.js'
 
 /**
  * Shared image-upload logic for the serverless route (api/upload.ts) and the Vite dev middleware.

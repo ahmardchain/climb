@@ -2,7 +2,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import { handleUpload, MAX_BYTES } from './api/_lib/upload'
+import { handleUpload, MAX_BYTES } from './api/_lib/upload.js'
 
 /** Serves POST /api/upload in `vite dev` with the same code the Vercel route runs. */
 function uploadApi(env: Record<string, string | undefined>): Plugin {
