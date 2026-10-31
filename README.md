@@ -1,3 +1,5 @@
+Climb — social bounties on Arc.
+
 # climb
 
 A social bounty app on Arc. Post a task with a USDC reward held in escrow, others submit proof, and the reward is paid out onchain when the proof is accepted. Solo bounties are decided by the creator. Open bounties are crowdfunded and decided by a funder vote.
