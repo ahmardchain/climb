@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAccount, usePublicClient } from 'wagmi'
-import { erc20Abi, type Address, type PublicClient } from 'viem'
+import { erc20Abi, type Address, type Hex, type PublicClient } from 'viem'
 import { climbEscrowAbi } from '@/lib/climbAbi'
 import { syncEvents } from '@/lib/eventStore'
 import {
@@ -196,6 +196,8 @@ export interface PaidInfo {
   claimant: Address
   payout: bigint
   fee: bigint
+  /** Transaction that paid out: acceptClaim, or resolveVote for an open bounty. */
+  txHash: Hex
 }
 
 /** What each paid bounty paid out, by bounty id, read from BountyPaid events. totalFunds is zeroed onchain at payout. */
@@ -207,7 +209,7 @@ export function usePaidInfo(): Map<string, PaidInfo> {
       if (e.name !== 'BountyPaid') continue
       const { bountyId, claimId, claimant, payout, fee } = e.args
       if (typeof bountyId === 'bigint' && typeof claimId === 'bigint' && typeof claimant === 'string' && typeof payout === 'bigint' && typeof fee === 'bigint') {
-        m.set(bountyId.toString(), { claimId, claimant: claimant as Address, payout, fee })
+        m.set(bountyId.toString(), { claimId, claimant: claimant as Address, payout, fee, txHash: e.txHash })
       }
     }
     return m

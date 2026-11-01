@@ -11,9 +11,11 @@ import { buildAddressExplorerUrl } from '@/onchain-facts'
 import { useBountyDetail, useEvents, usePaidInfo, useWalletInfo, type BountyDetail } from '@/hooks/useClimbData'
 import { buildShareLink } from '@/lib/share'
 import { useClimbTx } from '@/hooks/useClimbTx'
-import { Btn, Sheet, TxStatus, TypeBadge, fmtUsdc, useNow } from '@/components/ui'
+import { Btn, Sheet, exactUsdc, TxStatus, TypeBadge, fmtUsdc, useNow } from '@/components/ui'
 import { CommentThread } from '@/components/CommentThread'
 import { ClaimNote } from '@/components/ClaimNote'
+import { OnchainActivity } from '@/components/OnchainActivity'
+import { buildTxExplorerUrl } from '@/onchain-facts'
 import { ProofPreview } from '@/components/ProofImage'
 import { ClaimForm, ContributeForm, type Runner } from '@/components/BountyForms'
 import { VoteCard } from '@/components/VoteCard'
@@ -232,7 +234,18 @@ export function BountyPage({ id }: { id: bigint }) {
         </div>
         {winner && (
           <p className="mt-3 text-xs text-[var(--muted)]">
-            {fmtUsdc(winner.payout)} USDC went to <AddressLink address={winner.claimant} />. Platform fee: {fmtUsdc(winner.fee)} USDC.
+            <a
+              href={buildTxExplorerUrl(CHAIN_ID, winner.txHash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[var(--accent-hover)] hover:underline"
+            >
+              {exactUsdc(winner.payout)} USDC went to
+            </a>{' '}
+            <AddressLink address={winner.claimant} />. Platform fee: {exactUsdc(winner.fee)} USDC.{' '}
+            <a href={buildTxExplorerUrl(CHAIN_ID, winner.txHash)} target="_blank" rel="noopener noreferrer" className="underline">
+              View payout transaction
+            </a>
           </p>
         )}
       </section>
@@ -357,6 +370,7 @@ export function BountyPage({ id }: { id: bigint }) {
       </section>
 
       <CommentThread bountyId={bounty.id} events={store?.events ?? []} run={run} busy={busy} />
+      <OnchainActivity bountyId={bounty.id} />
         </div>
       </div>
 

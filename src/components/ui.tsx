@@ -3,7 +3,15 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Check, ExternalLink, Loader2, X } from 'lucide-react'
 import { buildTxExplorerUrl } from '@/onchain-facts'
 import { CHAIN_ID } from '@/lib/climb'
+import { formatUsdc } from '@/onchain-money'
 import type { TxState } from '@/hooks/useClimbTx'
+
+/** Exact USDC amount with every significant digit, at least 2 decimals (e.g. "0.975", "1.00"). Used where precision matters. */
+export function exactUsdc(raw: bigint): string {
+  const s = formatUsdc(raw)
+  if (!s.includes('.')) return `${s}.00`
+  return s.split('.')[1].length === 1 ? `${s}0` : s
+}
 
 /** USDC for display: at most 2 decimals, rounded (e.g. "1.57"). Tiny non-zero amounts read "<0.01". */
 export function fmtUsdc(raw: bigint): string {
