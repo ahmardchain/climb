@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Flag, Plus, Timer, Trophy } from 'lucide-react'
+import { ExternalLink, Flag, Plus, Timer, Trophy } from 'lucide-react'
 import { link } from '@/lib/router'
-import { ESCROW_ADDRESS, Status, classifyProof } from '@/lib/climb'
+import { CHAIN_ID, ESCROW_ADDRESS, Status, classifyProof, shortAddress } from '@/lib/climb'
+import { buildTxExplorerUrl } from '@/onchain-facts'
 import { climbEscrowAbi } from '@/lib/climbAbi'
 import { bountyMeta } from '@/lib/derive'
 import { useUi } from '@/lib/ui-context'
@@ -10,7 +11,7 @@ import { useClimbTx } from '@/hooks/useClimbTx'
 import { Btn, TxStatus, fmtUsdc, useNow } from '@/components/ui'
 import { BountyCard } from '@/components/BountyCard'
 import { ProofImage } from '@/components/ProofImage'
-import { PersonLink, timeAgo } from '@/components/shared'
+import { timeAgo } from '@/components/shared'
 
 const TABS = [
   { id: 'open', label: 'Open', status: Status.Active, icon: Flag, empty: 'No open bounties yet. Post the first one.' },
@@ -142,6 +143,7 @@ function RecentPayouts() {
           title: meta.get(id)?.title ?? `Bounty #${id}`,
           claimant: e.args.claimant as string,
           payout: e.args.payout as bigint,
+          txHash: e.txHash,
           ts: e.ts,
         }
       })
@@ -161,8 +163,20 @@ function RecentPayouts() {
                 <a {...link(`/bounty/${r.id}`)} className="line-clamp-1 font-semibold hover:underline">
                   {r.title}
                 </a>
-                <div className="text-xs text-[var(--muted)]">
-                  <PersonLink address={r.claimant} /> · {timeAgo(r.ts, now)}
+                <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-[var(--muted)]">
+                  <span className="font-mono tabular-nums">{shortAddress(r.claimant)}</span>
+                  <span aria-hidden>·</span>
+                  <span>{timeAgo(r.ts, now)}</span>
+                  <span aria-hidden>·</span>
+                  <a
+                    href={buildTxExplorerUrl(CHAIN_ID, r.txHash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-mono font-semibold text-[var(--accent-hover)] hover:underline"
+                    aria-label={`View payout transaction ${r.txHash} on the explorer`}
+                  >
+                    {r.txHash.slice(0, 8)}…{r.txHash.slice(-6)} <ExternalLink className="size-3" />
+                  </a>
                 </div>
               </div>
               <span className="display shrink-0 text-lg font-bold tabular-nums" style={{ color: 'var(--success)' }}>
